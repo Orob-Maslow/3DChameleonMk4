@@ -32,9 +32,13 @@ Single Button Press Commands (count pulses of selector)
  
 */
 
-#include <SSD1306Ascii.h> //i2C OLED
-#include <SSD1306AsciiWire.h> //i2C OLED
-#include <SparkFunSX1509.h> // sparkfun i/o expansion board - used for additional filament sensors as well as communications with secondary boards
+//#include <SSD1306Ascii.h> //i2C OLED
+//#include <SSD1306AsciiWire.h> //i2C OLED
+//#include <SparkFunSX1509.h> // sparkfun i/o expansion board - used for additional filament sensors as well as communications with secondary boards
+#include <SPI.h>
+#include <Wire.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
 #include <Wire.h>
 #include <SPI.h>
 #include <Servo.h>
@@ -168,7 +172,8 @@ Single Button Press Commands (count pulses of selector)
 // Declaration for an SSD1306 display connected to I2C (SDA, SCL pins)
 #define OLED_RESET  -1 // Reset pin # (or -1 if sharing Arduino reset pin)
 #define OLED_I2C_ADDRESS 0x3C
-SSD1306AsciiWire oled;
+//SSD1306AsciiWire oled;
+Adafruit_SSD1306 oled(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 // define sparkfun io expansion
 const byte SX1509_ADDRESS = 0x3E; // SX1509 I2C address
@@ -177,7 +182,7 @@ const byte SX1509_ADDRESS = 0x3E; // SX1509 I2C address
 #define SX1509_FILAMENT_2 2
 #define SX1509_FILAMENT_3 3
 #define SX1509_OUTPUT 4
-SX1509 io;                        // Create an SX1509 object to be used throughout
+//SX1509 io;                        // Create an SX1509 object to be used throughout
 
 
 // defines pins numbers - 3D Chameleon Board
@@ -249,7 +254,7 @@ void setup()
 	Wire.setClock(400000L); //set clock
 
   // set up IO expander
-  if (io.begin(SX1509_ADDRESS) == true)
+ /* if (io.begin(SX1509_ADDRESS) == true)
   {
     io.pinMode(SX1509_FILAMENT_0, INPUT_PULLUP);
     io.pinMode(SX1509_FILAMENT_1, INPUT_PULLUP);
@@ -258,17 +263,24 @@ void setup()
     io.pinMode(SX1509_OUTPUT, OUTPUT);
     ioEnabled = true;
   }
-
+*/
   // enable OLED display
   //oled.begin(&Adafruit128x64, OLED_I2C_ADDRESS);
-  oled.begin(&Adafruit128x32, OLED_I2C_ADDRESS);
+  oled.begin(SSD1306_SWITCHCAPVCC, OLED_I2C_ADDRESS);
   // wait for it to start up
   delay(50);
     
 
   // welcome screen
-  oled.setFont(Adafruit5x7);
-  oled.clear(); //clear display
+  //oled.setFont(Adafruit5x7);
+  oled.clearDisplay();
+
+  oled.setTextSize(1);      // Normal 1:1 pixel scale
+  oled.setTextColor(SSD1306_WHITE); // Draw white text
+  oled.setCursor(0, 0);     // Start at top-left corner
+  oled.cp437(true); 
+  oled.clearDisplay();
+//oled.clear(); //clear display
 	//oled.println("");
   oled.println("       Welcome!"); //print a welcome message  
   //oled.println("");
@@ -336,19 +348,20 @@ void loop()
         displayCommand(pulseCount);
         if(pulseCount>1) vibrateMotor();
       }
-      delay(400);  // each pulse is 400+ milliseconds apart 
+      //delay(400);  // each pulse is 400+ milliseconds apart
+      delay(40);  // each pulse is 40+ milliseconds apart 
     }
     processCommand(pulseCount); // ok... execute whatever command was caught (by pulse count)
     pulseCount = 0;
   }
 
   // updates IO block, duh!  No really, grabs the state of the sparkfun gpio expansion
-  updateIOBlock();
+  //updateIOBlock();
 
   // each loop adds 50ms delay, so that gets added AFTER the command is processed before the next one can start
-  delay(50);
+  delay(20);
 }
-
+/*
 // read the sparkfun SX1509 io
 void updateIOBlock()
 {
@@ -360,38 +373,38 @@ void updateIOBlock()
       T3Loaded = io.digitalRead(SX1509_FILAMENT_3);
     }
 }
-
+*/
 // display command for each button pulse
 void displayCommand(long commandCount)
 {
 
   switch(commandCount)
   {
-  case 2:
+  case 2: // 2 * 30 = 60
     displayText(25, "    Switch to T0");
     break;
-  case 3:
+  case 3: // 3 * 30 = 90
     displayText(25, "    Switch to T1");
     break;
-  case 4:
+  case 4: // 4 * 30 = 120
     displayText(25, "    Switch to T2");
     break;
-  case 5:
+  case 5: // 5 * 30 = 150
     displayText(25, "    Switch to T3");
     break;
-  case 6:
+  case 6: // 6 * 30 = 180
     displayText(25, "    Home/Load T0");
     break;
-  case 7:
+  case 7: // 7 * 30 = 210
     displayText(28, "    Unload/Home");
     break;
-  case 8:
+  case 8: // 8 * 30 = 240
     displayText(50, "        Home");
     break;  
-  case 9:
+  case 9: // 9 * 30 = 270
     displayText(50, "        Next");
     break;
-  case 10:
+  case 10: // 10 * 30 = 300
     displayText(40, "       Random");
     break;
   default:
@@ -529,7 +542,7 @@ void displayText(int offset, String str)
 {
 
   //if(displayEnabled){
-    oled.clear();
+    oled.clearDisplay();
     //oled.println("");
     oled.println("   3DChameleon Mk4"); //print a welcome message
     //oled.println("");
