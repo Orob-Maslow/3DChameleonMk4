@@ -194,7 +194,7 @@ void loop(){
           digitalWrite(extEnable, HIGH);// ok, done pressing button, so make sure we're not energized (high is no, low is yes)
         }
       }
-      delay(20);  // each pulse is 40+ milliseconds apart 
+      delay(40);  // each pulse is 40+ milliseconds apart 
     }
     processCommand(pulseCount); // ok... execute whatever command was caught (by pulse count)
     pulseCount = 0;
@@ -234,7 +234,7 @@ void loop(){
   // updates IO block, duh!  No really, grabs the state of the sparkfun gpio expansion
   //updateIOBlock();
   // each loop adds 50ms delay, so that gets added AFTER the command is processed before the next one can start
-  delay(20);
+  delay(30);
 }
 /*void updateIOBlock(){ // read the sparkfun SX1509 io
     if(ioEnabled)    {
@@ -404,7 +404,7 @@ void processCommand(long commandCount){
     break;
   default:
     displayText(25, "       Clear");
-    delay(200);
+    delay(2000);
     displayText(25, "        Idle");
     break;
   }
@@ -556,7 +556,7 @@ void rotateExtruder(bool direction, long moveDistance){
   if(loaderMode==2){
    // keep waiting until button is pressed
    while (digitalRead(trigger) != 0){
-      delay(50);
+      delay(40);
     }
     // Move while button is pressed
     while (digitalRead(trigger) == 0){
