@@ -1,5 +1,6 @@
 /*  major changes from 4.1a to 4.2 by Rob Owings Dec 2024
 //  OLED 128x32
+//  added manual jog commands for pulse 9+
 //  change from button to command pin mode for klipper board direct wire
 //  first pin only selects filament or mode
 //  second pin loads but only when "activated"
@@ -8,6 +9,7 @@
 */
 
 // November 28, 2024
+
 /* 3DChameleon Mk4.1a Firmware
 
 Copyright 2024 William J. Steele
@@ -143,7 +145,7 @@ void setup(){
   oled.clearDisplay();
   oled.println("   Johnny 5 colors!"); //print a welcome message  
   oled.println("  3DChameleon Mk4");   //print a welcome message
-  oled.println("     Pro v4.1a");
+  oled.println("     Pro v4.2");
   oled.println("  - R. Owings -");
   oled.display();
   delay(3000);
@@ -413,7 +415,7 @@ void processCommand(long commandCount){
 void displayText(int offset, String str){  // just the routine to update the OLED
   oled.clearDisplay();
   oled.setCursor(0, 0);     // Start at top-left corner
-  oled.println(" 3DChameleon Mk4.1a"); //print a welcome message
+  oled.println(" 3DChameleon Mk4.2"); //print a welcome message
   oled.setCursor(0,offset);     // Start at top-left corner
   oled.println(str);
   if(ioEnabled){
